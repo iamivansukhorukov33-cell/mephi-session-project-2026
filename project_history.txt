@@ -1,0 +1,124 @@
+=== HOSTNAME ===
+     Static hostname: mephi-2026.domain.local
+           Icon name: computer-vm
+             Chassis: vm 🖴
+          Machine ID: 4b8c5e9820fe4bebb1fef8f92d81e7e7
+             Boot ID: 6fa6d09e6e6d4f28b400d4bf4243f79d
+        AF_VSOCK CID: 1
+      Virtualization: qemu
+    Operating System: Fedora Linux 43 (Server Edition)
+         CPE OS Name: cpe:/o:fedoraproject:fedora:43
+      OS Support End: Wed 2026-12-02
+OS Support Remaining: 5month 2w 5d
+              Kernel: Linux 6.17.1-300.fc43.aarch64
+        Architecture: arm64
+     Hardware Vendor: QEMU
+      Hardware Model: QEMU Virtual Machine
+    Hardware Version: virt-10.0
+    Firmware Version: 0.0.0
+       Firmware Date: Fri 2015-02-06
+        Firmware Age: 11y 4month 5d
+mephi-2026.domain.local
+
+=== NETWORK ===
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+2: enp0s1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 52:7d:fb:24:9e:e5 brd ff:ff:ff:ff:ff:ff
+    altname enx527dfb249ee5
+    inet 192.168.64.2/24 brd 192.168.64.255 scope global dynamic noprefixroute enp0s1
+       valid_lft 1955sec preferred_lft 1955sec
+    inet6 fdb6:3617:f67a:dca3:507d:fbff:fe24:9ee5/64 scope global dynamic noprefixroute 
+       valid_lft 2591955sec preferred_lft 604755sec
+    inet6 fe80::507d:fbff:fe24:9ee5/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+NAME    UUID                                  TYPE      DEVICE 
+enp0s1  fb132a46-d53a-36c6-a9d3-6c7d8b308c13  ethernet  enp0s1 
+lo      fb4b3c4e-eb8a-4dc8-9aa2-4cdaf68cfc3c  loopback  lo     
+
+=== PACKAGES ===
+nginx-1.30.2-1.fc43.aarch64
+tcpdump-4.99.5-6.fc43.aarch64
+libcap-ng-utils-0.9.3-1.fc43.aarch64
+git-2.54.0-1.fc43.aarch64
+
+=== TCPDUMP RPM FILE ===
+-rw-r--r--. 1 ivan ivan 509K Jun 13 12:16 /home/ivan/mephi-session-project-2026/tcpdump-4.99.6-2.fc43.aarch64.rpm
+
+=== DISK AND FSTAB ===
+NAME            FSTYPE      FSVER    LABEL      UUID                                   FSAVAIL FSUSE% MOUNTPOINTS
+sr0                                                                                                   
+zram0           swap        1        zram0      f3a9ba20-bc61-40d6-b1a1-20cf94b8f563                  [SWAP]
+vda                                                                                                   
+├─vda1          vfat        FAT32               3A12-C9C4                                 587M     2% /boot/efi
+├─vda2          xfs                             d94af32f-4d09-4b98-996f-c7f7549af148      1.5G    20% /boot
+└─vda3          LVM2_member LVM2 001            DSbuoQ-ByRp-l25X-CtDv-F2ZG-fSSH-MzMV05                
+  └─fedora-root xfs                             70e118dd-4505-4cf8-9ab7-75fb325c0815     12.4G    17% /
+vdb                                                                                                   
+└─vdb1          ext4        1.0      MEPHI_DATA a57294ab-821a-48bb-867c-d76058babdb0      9.2G     0% /data/mephi-web
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vdb1       9.8G  2.1M  9.3G   1% /data/mephi-web
+
+#
+# /etc/fstab
+# Created by anaconda on Sat Jun 13 08:24:02 2026
+#
+# Accessible filesystems, by reference, are maintained under '/dev/disk/'.
+# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info.
+#
+# After editing this file, run 'systemctl daemon-reload' to update systemd
+# units generated from this file.
+#
+UUID=70e118dd-4505-4cf8-9ab7-75fb325c0815 / xfs defaults 0 0
+UUID=d94af32f-4d09-4b98-996f-c7f7549af148 /boot xfs defaults 0 0
+UUID=3A12-C9C4 /boot/efi vfat umask=0077,shortname=winnt 0 2
+UUID=a57294ab-821a-48bb-867c-d76058babdb0 /data/mephi-web ext4 defaults 0 2
+
+=== NGINX ===
+enabled
+active
+Hello from Student: M255648
+Hello from Student: M255648
+
+=== USERS AND RIGHTS ===
+uid=1001(mephi-admin) gid=1002(mephi-admin) groups=1002(mephi-admin),1001(mephi-devs)
+drwxr-xr-x. 3 root        root         23 Jun 13 12:32 /data
+drwxrwsr-x. 3 mephi-admin mephi-devs 4096 Jun 13 12:38 /data/mephi-web
+total 20
+-rw-r--r--. 1 mephi-admin mephi-devs unconfined_u:object_r:httpd_sys_content_t:s0    28 Jun 13 12:43 index.html
+drwx------. 2 mephi-admin mephi-devs system_u:object_r:httpd_sys_content_t:s0     16384 Jun 13 12:32 lost+found
+
+=== SELINUX ===
+Enforcing
+/data/mephi-web(/.*)?                              all files          system_u:object_r:httpd_sys_content_t:s0 
+
+=== TCPDUMP CAPABILITIES ===
+/usr/sbin/tcpdump cap_net_admin,cap_net_raw=ep
+tcpdump version 4.99.5
+libpcap version 1.10.5 (with TPACKET_V3)
+OpenSSL 3.5.1 1 Jul 2025
+64-bit build, 64-bit time_t
+Usage: tcpdump [-AbdDefhHIJKlLnNOpqStuUvxX#] [ -B size ] [ -c count ] [--count]
+		[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]
+		[ -i interface ] [ --immediate-mode ] [ -j tstamptype ]
+		[ -M secret ] [ --number ] [ --print ] [ -Q in|out|inout ]
+		[ -r file ] [ -s snaplen ] [ -T type ] [ --version ]
+		[ -V file ] [ -w file ] [ -W filecount ] [ -y datalinktype ]
+
+=== ROOT LOGIN RESTRICTION ===
+root
+/etc/pam.d/sshd:auth required pam_listfile.so item=user sense=deny file=/etc/ssh/denied_users onerr=succeed
+/etc/pam.d/login:auth required pam_listfile.so item=user sense=deny file=/etc/ssh/denied_users onerr=succeed
+
+=== STATIC NETWORK CONFIGURATION ===
+ipv4.method:                            manual
+ipv4.dns:                               8.8.8.8
+ipv4.dns-search:                        --
+ipv4.dns-options:                       --
+ipv4.dns-priority:                      0
+ipv4.addresses:                         192.168.1.100/24
+ipv4.gateway:                           192.168.1.1

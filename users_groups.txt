@@ -1,0 +1,3 @@
+uid=1000(ivan) gid=1000(ivan) groups=1000(ivan),10(wheel)
+uid=1001(mephi-admin) gid=1002(mephi-admin) groups=1002(mephi-admin),1001(mephi-devs)
+mephi-devs:x:1001:mephi-admin

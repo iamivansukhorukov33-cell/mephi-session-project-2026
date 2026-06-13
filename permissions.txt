@@ -1,0 +1,5 @@
+drwxr-xr-x. 3 root        root         23 Jun 13 12:32 /data
+drwxrwsr-x. 3 mephi-admin mephi-devs 4096 Jun 13 12:38 /data/mephi-web
+total 20
+-rw-r--r--. 1 mephi-admin mephi-devs    28 Jun 13 12:43 index.html
+drwx------. 2 mephi-admin mephi-devs 16384 Jun 13 12:32 lost+found

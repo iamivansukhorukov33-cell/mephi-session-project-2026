@@ -1,124 +1,435 @@
-=== HOSTNAME ===
-     Static hostname: mephi-2026.domain.local
-           Icon name: computer-vm
-             Chassis: vm 🖴
-          Machine ID: 4b8c5e9820fe4bebb1fef8f92d81e7e7
-             Boot ID: 6fa6d09e6e6d4f28b400d4bf4243f79d
-        AF_VSOCK CID: 1
-      Virtualization: qemu
-    Operating System: Fedora Linux 43 (Server Edition)
-         CPE OS Name: cpe:/o:fedoraproject:fedora:43
-      OS Support End: Wed 2026-12-02
-OS Support Remaining: 5month 2w 5d
-              Kernel: Linux 6.17.1-300.fc43.aarch64
-        Architecture: arm64
-     Hardware Vendor: QEMU
-      Hardware Model: QEMU Virtual Machine
-    Hardware Version: virt-10.0
-    Firmware Version: 0.0.0
-       Firmware Date: Fri 2015-02-06
-        Firmware Age: 11y 4month 5d
-mephi-2026.domain.local
+    1  lsblk
+    2  lsblk -f
+    3  sudo parted -s /dev/vdb mklabel gpt
+    4  sudo parted -s /dev/vdb mkpart primary ext4 0% 100%
+    5  sudo mkfs.ext4 -L MEPHI_DATA /dev/vdb1
+    6  sudo mkdir -p /data/mephi-web
+    7  sudo mount /dev/vdb1 /data/mephi-web
+    8  lsblk -f
+    9  df -h /data/mephi-web
+   10  UUID=$(blkid -s UUID -o value /dev/vdb1)
+   11  echo "UUID=$UUID /data/mephi-web ext4 defaults 0 2" | sudo tee -a /etc/fstab
+   12  sudo systemctl daemon-reload
+   13  sudo umount /data/mephi-web
+   14  sudo mount -a
+   15  df -h /data/mephi-web
+   16  cat /etc/fstab
+   17  sudo sed -i '/UUID= \/data\/mephi-web ext4 defaults 0 2/d' /etc/fstab
+   18  UUID=$(sudo blkid -s UUID -o value /dev/vdb1)
+   19  echo "UUID=$UUID /data/mephi-web ext4 defaults 0 2" | sudo tee -a /etc/fstab
+   20  sudo mount -a
+   21  df -h /data/mephi-web
+   22  tail -n 5 /etc/fstab
+   23  sudo systemctl daemon-reload
+   24  sudo mount -a
+   25  df -h /data/mephi-web
+   26  [200~echo "Hello from Student: 12345" | sudo tee /data/mephi-web/index.html
+   27  sudo tee /etc/nginx/conf.d/mephi-web.conf > /dev/null <<'EOF'
+   28  server {
+   29      listen 80;
+   30      server_name _;
+   31      root /data/mephi-web;
+   32      index index.html;
+   33      location / {
+   34          try_files $uri $uri/ =404;
+   35      }
+   36  }
+   37  EOF
+   38  sudo nginx -t
+   39  echo "Hello from Student: 12345" | sudo tee /data/mephi-web/index.html
+   40  sudo tee /etc/nginx/conf.d/mephi-web.conf > /dev/null <<'EOF'
+   41  server {
+   42      listen 80;
+   43      server_name _;
+   44      root /data/mephi-web;
+   45      index index.html;
+   46      location / {
+   47          try_files $uri $uri/ =404;
+   48      }
+   49  }
+   50  EOF
+   51  sudo nginx -t
+   52  sudo systemctl enable --now nginx
+   53  sudo systemctl status nginx --no-pager
+   54  echo "Hello from Student: M255648" | sudo tee /data/mephi-web/index.html
+   55  sudo tee /etc/nginx/conf.d/mephi-web.conf > /dev/null <<'EOF'
+   56  server {
+   57      listen 80;
+   58      server_name _;
+   59      root /data/mephi-web;
+   60      index index.html;
+   61      location / {
+   62          try_files $uri $uri/ =404;
+   63      }
+   64  }
+   65  EOF
+   66  sudo nginx -t
+   67  sudo systemctl enable --now nginx
+   68  sudo systemctl status nginx --no-pager
+   69  curl http://localhost
+   70  sudo mv /etc/nginx/conf.d/mephi-web.conf /tmp/mephi-web.conf.bak 2>/dev/null || true
+   71  sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
+   72  sudo tee /etc/nginx/nginx.conf > /dev/null <<'EOF'
+   73  user nginx;
+   74  worker_processes auto;
+   75  error_log /var/log/nginx/error.log;
+   76  pid /run/nginx.pid;
+   77  events {
+   78      worker_connections 1024;
+   79  }
+   80  http {
+   81      include /etc/nginx/mime.types;
+   82      default_type application/octet-stream;
+   83      access_log /var/log/nginx/access.log;
+   84      sendfile on;
+   85      keepalive_timeout 65;
+   86      server {
+   87          listen 80 default_server;
+   88          server_name _;
+   89          root /data/mephi-web;
+   90          index index.html;
+   91          location / {
+   92              try_files $uri $uri/ =404;
+   93          }
+   94      }
+   95  }
+   96  EOF
+   97  sudo nginx -t
+   98  sudo systemctl restart nginx
+   99  curl http://localhost
+  100  curl http://192.168.64.2
+  101  sudo groupadd -f mephi-devs
+  102  sudo useradd -m -G mephi-devs mephi-admin 2>/dev/null || true
+  103  sudo chown -R mephi-admin:mephi-devs /data/mephi-web
+  104  sudo chmod 2775 /data/mephi-web
+  105  sudo chmod 644 /data/mephi-web/index.html
+  106  sudo semanage fcontext -a -t httpd_sys_content_t "/data/mephi-web(/.*)?" 2>/dev/null || sudo semanage fcontext -m -t httpd_sys_content_t "/data/mephi-web(/.*)?"
+  107  sudo restorecon -Rv /data/mephi-web
+  108  sudo systemctl restart nginx
+  109  ls -ld /data /data/mephi-web
+  110  ls -lZ /data/mephi-web
+  111  getenforce
+  112  curl http://localhost
+  113  curl http://192.168.64.2
+  114  sudo chmod u-s /usr/sbin/tcpdump
+  115  sudo setcap cap_net_raw,cap_net_admin+ep /usr/sbin/tcpdump
+  116  getcap /usr/sbin/tcpdump
+  117  sudo -u mephi-admin tcpdump --help | head
+  118  echo root | sudo tee /etc/ssh/denied_users
+  119  sudo cp /etc/pam.d/sshd /etc/pam.d/sshd.bak
+  120  sudo cp /etc/pam.d/login /etc/pam.d/login.bak
+  121  sudo sed -i '1iauth required pam_listfile.so item=user sense=deny file=/etc/ssh/denied_users onerr=succeed' /etc/pam.d/sshd
+  122  sudo sed -i '1iauth required pam_listfile.so item=user sense=deny file=/etc/ssh/denied_users onerr=succeed' /etc/pam.d/login
+  123  sudo grep pam_listfile /etc/pam.d/sshd /etc/pam.d/login
+  124  cat /etc/ssh/denied_users
+  125  sudo whoami
+  126  cd ~/mephi-session-project-2026
+  127  { echo "=== HOSTNAME ==="; hostnamectl; hostname;  echo; echo "=== NETWORK ==="; ip a; nmcli connection show;  echo; echo "=== PACKAGES ==="; rpm -q nginx tcpdump libcap-ng-utils git;  echo; echo "=== TCPDUMP RPM FILE ==="; ls -lh ~/mephi-session-project-2026/tcpdump*.rpm;  echo; echo "=== DISK AND FSTAB ==="; lsblk -f; df -h /data/mephi-web; cat /etc/fstab;  echo; echo "=== NGINX ==="; nginx -t; systemctl status nginx --no-pager; curl http://localhost; curl http://192.168.64.2;  echo; echo "=== USERS AND RIGHTS ==="; id mephi-admin; ls -ld /data /data/mephi-web; ls -lZ /data/mephi-web;  echo; echo "=== SELINUX ==="; getenforce; semanage fcontext -l | grep mephi-web;  echo; echo "=== TCPDUMP CAPABILITIES ==="; getcap /usr/sbin/tcpdump; sudo -u mephi-admin tcpdump --help | head;  echo; echo "=== ROOT LOGIN RESTRICTION ==="; cat /etc/ssh/denied_users; grep pam_listfile /etc/pam.d/sshd /etc/pam.d/login; } | tee project_history.txt
+  128  ls -lh
+  129  cd ~/mephi-session-project-2026
+  130  { echo "=== HOSTNAME ==="; hostnamectl; hostname;  echo; echo "=== NETWORK ==="; ip a; nmcli connection show;  echo; echo "=== PACKAGES ==="; rpm -q nginx tcpdump libcap-ng-utils git;  echo; echo "=== TCPDUMP RPM FILE ==="; ls -lh ~/mephi-session-project-2026/tcpdump*.rpm;  echo; echo "=== DISK AND FSTAB ==="; lsblk -f; df -h /data/mephi-web; cat /etc/fstab;  echo; echo "=== NGINX ==="; sudo nginx -t; systemctl is-enabled nginx; systemctl is-active nginx; curl http://localhost; curl http://192.168.64.2;  echo; echo "=== USERS AND RIGHTS ==="; id mephi-admin; ls -ld /data /data/mephi-web; ls -lZ /data/mephi-web;  echo; echo "=== SELINUX ==="; getenforce; sudo semanage fcontext -l | grep mephi-web || true;  echo; echo "=== TCPDUMP CAPABILITIES ==="; getcap /usr/sbin/tcpdump; sudo -u mephi-admin tcpdump --help | head;  echo; echo "=== ROOT LOGIN RESTRICTION ==="; cat /etc/ssh/denied_users; grep pam_listfile /etc/pam.d/sshd /etc/pam.d/login; } | tee project_history.txt
+  131  ls -lh
+  132  sudo nmcli connection modify enp0s1 ipv4.method manual ipv4.addresses 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.dns 8.8.8.8
+  133  sudo nmcli connection show enp0s1 | grep -E 'ipv4.method|ipv4.addresses|ipv4.gateway|ipv4.dns'
+  134  cd ~/mephi-session-project-2026
+  135  { echo; echo "=== STATIC NETWORK CONFIGURATION ==="; sudo nmcli connection show enp0s1 | grep -E 'ipv4.method|ipv4.addresses|ipv4.gateway|ipv4.dns'; } | tee -a project_history.txt
+  136  tail -n 20 project_history.txt
+  137  sudo nmcli connection down enp0s1; sudo nmcli connection up enp0s1
+  138  ls -lh ~/mephi-session-project-2026
+  139  exit
+  140  sudo nmcli connection modify enp0s1 ipv4.method manual ipv4.addresses 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.dns 8.8.8.8
+  141  sudo nmcli connection down enp0s1; sudo nmcli connection up enp0s1
+  142  sudo nmcli c m enp0s1 ipv4.method auto
+  143  subo reboot
+  144  sudo reboot
+  145  cd ~/mephi-session-project-2026
+  146  ping -c 4 192.168.1.1 > network_check.txt 2>&1
+  147  ping -c 4 8.8.8.8 >> network_check.txt 2>&1
+  148  ping -c 4 ya.ru >> network_check.txt 2>&1
+  149  journalctl -u nginx --since "30 minutes ago" --no-pager > nginx_recent_logs.txt
+  150  cat /etc/fstab > fstab.txt
+  151  getenforce > selinux_status.txt
+  152  ls -Z /data/mephi-web > file_contexts.txt
+  153  sudo semanage fcontext -l | grep mephi-web >> file_contexts.txt 2>/dev/null || true
+  154  getcap /usr/sbin/tcpdump > tcpdump_capabilities.txt
+  155  ls -ld /data /data/mephi-web > permissions.txt
+  156  ls -l /data/mephi-web >> permissions.txt
+  157  id ivan > users_groups.txt
+  158  id mephi-admin >> users_groups.txt
+  159  getent group mephi-devs >> users_groups.txt
+  160  cp /data/mephi-web/index.html index.html
+  161  curl http://localhost > curl_output.txt
+  162  curl http://192.168.64.2 >> curl_output.txt 2>&1 || true
+  163  curl http://192.168.1.100 >> curl_output.txt 2>&1 || true
+  164  ls -lh
+  165  exit
+  166  sudo systemctl restart nginx
+  167  curl http://localhost
+  168  curl http://192.168.64.2
+  169  sudo nmcli connection modify enp0s1 ipv4.method manual ipv4.addresses 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.dns 8.8.8.8
+  170  sudo nmcli connection down enp0s1; sudo nmcli connection up enp0s1
+  171  sudo mkdir -p /mnt/utm
+  172  sudo mount -t 9p -o trans=virtio,version=9p2000.L share /mnt/utm
+  173  sudo cp report_M255648.txt /mnt/utm/
+  174  ls /mnt/utm
+  175  poweroff
+  176  whoami
+  177  hostname
+  178  hostnamectl
+  179  ip a
+  180  nmcli connection show enp0s1
+  181  lsblk
+  182  lsblk -f
+  183  df -h /data/mephi-web
+  184  cat /etc/fstab
+  185  systemctl status nginx --no-pager
+  186  curl http://localhost
+  187  getenforce
+  188  getcap /usr/sbin/tcpdump
+  189  cat /etc/ssh/denied_users
+  190  history -a
+  191  history > ~/project_history.txt
+  192  cat ~/.bash_history >> ~/project_history.txt
+  193  cp ~/project_history.txt ~/mephi-session-project-2026/project_history.txt
+  194  ls -lh ~/project_history.txt ~/mephi-session-project-2026/project_history.txt
+  195  whoami
+  196  hostname
+  197  hostnamectl
+  198  ip a
+  199  lsblk
+  200  lsblk -f
+  201  df -h /data/mephi-web
+  202  cat /etc/fstab
+  203  systemctl status nginx --no-pager
+  204  curl http://localhost
+  205  getenforce
+  206  getcap /usr/sbin/tcpdump
+  207  cat /etc/ssh/denied_users
+  208  history -a
+  209  history > ~/project_history.txt
+lsblk
+lsblk -f
+sudo parted -s /dev/vdb mklabel gpt
+sudo parted -s /dev/vdb mkpart primary ext4 0% 100%
+sudo mkfs.ext4 -L MEPHI_DATA /dev/vdb1
+sudo mkdir -p /data/mephi-web
+sudo mount /dev/vdb1 /data/mephi-web
+lsblk -f
+df -h /data/mephi-web
+UUID=$(blkid -s UUID -o value /dev/vdb1)
+echo "UUID=$UUID /data/mephi-web ext4 defaults 0 2" | sudo tee -a /etc/fstab
+sudo systemctl daemon-reload
+sudo umount /data/mephi-web
+sudo mount -a
+df -h /data/mephi-web
+cat /etc/fstab
+sudo sed -i '/UUID= \/data\/mephi-web ext4 defaults 0 2/d' /etc/fstab
+UUID=$(sudo blkid -s UUID -o value /dev/vdb1)
+echo "UUID=$UUID /data/mephi-web ext4 defaults 0 2" | sudo tee -a /etc/fstab
+sudo mount -a
+df -h /data/mephi-web
+tail -n 5 /etc/fstab
+sudo systemctl daemon-reload
+sudo mount -a
+df -h /data/mephi-web
+[200~echo "Hello from Student: 12345" | sudo tee /data/mephi-web/index.html
+sudo tee /etc/nginx/conf.d/mephi-web.conf > /dev/null <<'EOF'
+server {
+    listen 80;
+    server_name _;
 
-=== NETWORK ===
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    inet 127.0.0.1/8 scope host lo
-       valid_lft forever preferred_lft forever
-    inet6 ::1/128 scope host noprefixroute 
-       valid_lft forever preferred_lft forever
-2: enp0s1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
-    link/ether 52:7d:fb:24:9e:e5 brd ff:ff:ff:ff:ff:ff
-    altname enx527dfb249ee5
-    inet 192.168.64.2/24 brd 192.168.64.255 scope global dynamic noprefixroute enp0s1
-       valid_lft 1955sec preferred_lft 1955sec
-    inet6 fdb6:3617:f67a:dca3:507d:fbff:fe24:9ee5/64 scope global dynamic noprefixroute 
-       valid_lft 2591955sec preferred_lft 604755sec
-    inet6 fe80::507d:fbff:fe24:9ee5/64 scope link noprefixroute 
-       valid_lft forever preferred_lft forever
-NAME    UUID                                  TYPE      DEVICE 
-enp0s1  fb132a46-d53a-36c6-a9d3-6c7d8b308c13  ethernet  enp0s1 
-lo      fb4b3c4e-eb8a-4dc8-9aa2-4cdaf68cfc3c  loopback  lo     
+    root /data/mephi-web;
+    index index.html;
 
-=== PACKAGES ===
-nginx-1.30.2-1.fc43.aarch64
-tcpdump-4.99.5-6.fc43.aarch64
-libcap-ng-utils-0.9.3-1.fc43.aarch64
-git-2.54.0-1.fc43.aarch64
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+EOF
 
-=== TCPDUMP RPM FILE ===
--rw-r--r--. 1 ivan ivan 509K Jun 13 12:16 /home/ivan/mephi-session-project-2026/tcpdump-4.99.6-2.fc43.aarch64.rpm
+sudo nginx -t
+echo "Hello from Student: 12345" | sudo tee /data/mephi-web/index.html
+sudo tee /etc/nginx/conf.d/mephi-web.conf > /dev/null <<'EOF'
+server {
+    listen 80;
+    server_name _;
 
-=== DISK AND FSTAB ===
-NAME            FSTYPE      FSVER    LABEL      UUID                                   FSAVAIL FSUSE% MOUNTPOINTS
-sr0                                                                                                   
-zram0           swap        1        zram0      f3a9ba20-bc61-40d6-b1a1-20cf94b8f563                  [SWAP]
-vda                                                                                                   
-├─vda1          vfat        FAT32               3A12-C9C4                                 587M     2% /boot/efi
-├─vda2          xfs                             d94af32f-4d09-4b98-996f-c7f7549af148      1.5G    20% /boot
-└─vda3          LVM2_member LVM2 001            DSbuoQ-ByRp-l25X-CtDv-F2ZG-fSSH-MzMV05                
-  └─fedora-root xfs                             70e118dd-4505-4cf8-9ab7-75fb325c0815     12.4G    17% /
-vdb                                                                                                   
-└─vdb1          ext4        1.0      MEPHI_DATA a57294ab-821a-48bb-867c-d76058babdb0      9.2G     0% /data/mephi-web
-Filesystem      Size  Used Avail Use% Mounted on
-/dev/vdb1       9.8G  2.1M  9.3G   1% /data/mephi-web
+    root /data/mephi-web;
+    index index.html;
 
-#
-# /etc/fstab
-# Created by anaconda on Sat Jun 13 08:24:02 2026
-#
-# Accessible filesystems, by reference, are maintained under '/dev/disk/'.
-# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info.
-#
-# After editing this file, run 'systemctl daemon-reload' to update systemd
-# units generated from this file.
-#
-UUID=70e118dd-4505-4cf8-9ab7-75fb325c0815 / xfs defaults 0 0
-UUID=d94af32f-4d09-4b98-996f-c7f7549af148 /boot xfs defaults 0 0
-UUID=3A12-C9C4 /boot/efi vfat umask=0077,shortname=winnt 0 2
-UUID=a57294ab-821a-48bb-867c-d76058babdb0 /data/mephi-web ext4 defaults 0 2
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+EOF
 
-=== NGINX ===
-enabled
-active
-Hello from Student: M255648
-Hello from Student: M255648
+sudo nginx -t
+sudo systemctl enable --now nginx
+sudo systemctl status nginx --no-pager
+echo "Hello from Student: M255648" | sudo tee /data/mephi-web/index.html
+sudo tee /etc/nginx/conf.d/mephi-web.conf > /dev/null <<'EOF'
+server {
+    listen 80;
+    server_name _;
 
-=== USERS AND RIGHTS ===
-uid=1001(mephi-admin) gid=1002(mephi-admin) groups=1002(mephi-admin),1001(mephi-devs)
-drwxr-xr-x. 3 root        root         23 Jun 13 12:32 /data
-drwxrwsr-x. 3 mephi-admin mephi-devs 4096 Jun 13 12:38 /data/mephi-web
-total 20
--rw-r--r--. 1 mephi-admin mephi-devs unconfined_u:object_r:httpd_sys_content_t:s0    28 Jun 13 12:43 index.html
-drwx------. 2 mephi-admin mephi-devs system_u:object_r:httpd_sys_content_t:s0     16384 Jun 13 12:32 lost+found
+    root /data/mephi-web;
+    index index.html;
 
-=== SELINUX ===
-Enforcing
-/data/mephi-web(/.*)?                              all files          system_u:object_r:httpd_sys_content_t:s0 
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+EOF
 
-=== TCPDUMP CAPABILITIES ===
-/usr/sbin/tcpdump cap_net_admin,cap_net_raw=ep
-tcpdump version 4.99.5
-libpcap version 1.10.5 (with TPACKET_V3)
-OpenSSL 3.5.1 1 Jul 2025
-64-bit build, 64-bit time_t
-Usage: tcpdump [-AbdDefhHIJKlLnNOpqStuUvxX#] [ -B size ] [ -c count ] [--count]
-		[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]
-		[ -i interface ] [ --immediate-mode ] [ -j tstamptype ]
-		[ -M secret ] [ --number ] [ --print ] [ -Q in|out|inout ]
-		[ -r file ] [ -s snaplen ] [ -T type ] [ --version ]
-		[ -V file ] [ -w file ] [ -W filecount ] [ -y datalinktype ]
+sudo nginx -t
+sudo systemctl enable --now nginx
+sudo systemctl status nginx --no-pager
+curl http://localhost
+sudo mv /etc/nginx/conf.d/mephi-web.conf /tmp/mephi-web.conf.bak 2>/dev/null || true
+sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
+sudo tee /etc/nginx/nginx.conf > /dev/null <<'EOF'
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
 
-=== ROOT LOGIN RESTRICTION ===
-root
-/etc/pam.d/sshd:auth required pam_listfile.so item=user sense=deny file=/etc/ssh/denied_users onerr=succeed
-/etc/pam.d/login:auth required pam_listfile.so item=user sense=deny file=/etc/ssh/denied_users onerr=succeed
+events {
+    worker_connections 1024;
+}
 
-=== STATIC NETWORK CONFIGURATION ===
-ipv4.method:                            manual
-ipv4.dns:                               8.8.8.8
-ipv4.dns-search:                        --
-ipv4.dns-options:                       --
-ipv4.dns-priority:                      0
-ipv4.addresses:                         192.168.1.100/24
-ipv4.gateway:                           192.168.1.1
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    access_log /var/log/nginx/access.log;
+
+    sendfile on;
+    keepalive_timeout 65;
+
+    server {
+        listen 80 default_server;
+        server_name _;
+
+        root /data/mephi-web;
+        index index.html;
+
+        location / {
+            try_files $uri $uri/ =404;
+        }
+    }
+}
+EOF
+
+sudo nginx -t
+sudo systemctl restart nginx
+curl http://localhost
+curl http://192.168.64.2
+sudo groupadd -f mephi-devs
+sudo useradd -m -G mephi-devs mephi-admin 2>/dev/null || true
+sudo chown -R mephi-admin:mephi-devs /data/mephi-web
+sudo chmod 2775 /data/mephi-web
+sudo chmod 644 /data/mephi-web/index.html
+sudo semanage fcontext -a -t httpd_sys_content_t "/data/mephi-web(/.*)?" 2>/dev/null || sudo semanage fcontext -m -t httpd_sys_content_t "/data/mephi-web(/.*)?"
+sudo restorecon -Rv /data/mephi-web
+sudo systemctl restart nginx
+ls -ld /data /data/mephi-web
+ls -lZ /data/mephi-web
+getenforce
+curl http://localhost
+curl http://192.168.64.2
+sudo chmod u-s /usr/sbin/tcpdump
+sudo setcap cap_net_raw,cap_net_admin+ep /usr/sbin/tcpdump
+getcap /usr/sbin/tcpdump
+sudo -u mephi-admin tcpdump --help | head
+echo root | sudo tee /etc/ssh/denied_users
+sudo cp /etc/pam.d/sshd /etc/pam.d/sshd.bak
+sudo cp /etc/pam.d/login /etc/pam.d/login.bak
+sudo sed -i '1iauth required pam_listfile.so item=user sense=deny file=/etc/ssh/denied_users onerr=succeed' /etc/pam.d/sshd
+sudo sed -i '1iauth required pam_listfile.so item=user sense=deny file=/etc/ssh/denied_users onerr=succeed' /etc/pam.d/login
+sudo grep pam_listfile /etc/pam.d/sshd /etc/pam.d/login
+cat /etc/ssh/denied_users
+sudo whoami
+cd ~/mephi-session-project-2026
+{ echo "=== HOSTNAME ==="; hostnamectl; hostname;  echo; echo "=== NETWORK ==="; ip a; nmcli connection show;  echo; echo "=== PACKAGES ==="; rpm -q nginx tcpdump libcap-ng-utils git;  echo; echo "=== TCPDUMP RPM FILE ==="; ls -lh ~/mephi-session-project-2026/tcpdump*.rpm;  echo; echo "=== DISK AND FSTAB ==="; lsblk -f; df -h /data/mephi-web; cat /etc/fstab;  echo; echo "=== NGINX ==="; nginx -t; systemctl status nginx --no-pager; curl http://localhost; curl http://192.168.64.2;  echo; echo "=== USERS AND RIGHTS ==="; id mephi-admin; ls -ld /data /data/mephi-web; ls -lZ /data/mephi-web;  echo; echo "=== SELINUX ==="; getenforce; semanage fcontext -l | grep mephi-web;  echo; echo "=== TCPDUMP CAPABILITIES ==="; getcap /usr/sbin/tcpdump; sudo -u mephi-admin tcpdump --help | head;  echo; echo "=== ROOT LOGIN RESTRICTION ==="; cat /etc/ssh/denied_users; grep pam_listfile /etc/pam.d/sshd /etc/pam.d/login; } | tee project_history.txt
+ls -lh
+cd ~/mephi-session-project-2026
+{ echo "=== HOSTNAME ==="; hostnamectl; hostname;  echo; echo "=== NETWORK ==="; ip a; nmcli connection show;  echo; echo "=== PACKAGES ==="; rpm -q nginx tcpdump libcap-ng-utils git;  echo; echo "=== TCPDUMP RPM FILE ==="; ls -lh ~/mephi-session-project-2026/tcpdump*.rpm;  echo; echo "=== DISK AND FSTAB ==="; lsblk -f; df -h /data/mephi-web; cat /etc/fstab;  echo; echo "=== NGINX ==="; sudo nginx -t; systemctl is-enabled nginx; systemctl is-active nginx; curl http://localhost; curl http://192.168.64.2;  echo; echo "=== USERS AND RIGHTS ==="; id mephi-admin; ls -ld /data /data/mephi-web; ls -lZ /data/mephi-web;  echo; echo "=== SELINUX ==="; getenforce; sudo semanage fcontext -l | grep mephi-web || true;  echo; echo "=== TCPDUMP CAPABILITIES ==="; getcap /usr/sbin/tcpdump; sudo -u mephi-admin tcpdump --help | head;  echo; echo "=== ROOT LOGIN RESTRICTION ==="; cat /etc/ssh/denied_users; grep pam_listfile /etc/pam.d/sshd /etc/pam.d/login; } | tee project_history.txt
+ls -lh
+sudo nmcli connection modify enp0s1 ipv4.method manual ipv4.addresses 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.dns 8.8.8.8
+sudo nmcli connection show enp0s1 | grep -E 'ipv4.method|ipv4.addresses|ipv4.gateway|ipv4.dns'
+cd ~/mephi-session-project-2026
+{ echo; echo "=== STATIC NETWORK CONFIGURATION ==="; sudo nmcli connection show enp0s1 | grep -E 'ipv4.method|ipv4.addresses|ipv4.gateway|ipv4.dns'; } | tee -a project_history.txt
+tail -n 20 project_history.txt
+sudo nmcli connection down enp0s1; sudo nmcli connection up enp0s1
+ls -lh ~/mephi-session-project-2026
+exit
+sudo nmcli connection modify enp0s1 ipv4.method manual ipv4.addresses 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.dns 8.8.8.8
+sudo nmcli connection down enp0s1; sudo nmcli connection up enp0s1
+sudo nmcli c m enp0s1 ipv4.method auto
+subo reboot
+sudo reboot
+cd ~/mephi-session-project-2026
+ping -c 4 192.168.1.1 > network_check.txt 2>&1
+ping -c 4 8.8.8.8 >> network_check.txt 2>&1
+ping -c 4 ya.ru >> network_check.txt 2>&1
+journalctl -u nginx --since "30 minutes ago" --no-pager > nginx_recent_logs.txt
+cat /etc/fstab > fstab.txt
+getenforce > selinux_status.txt
+ls -Z /data/mephi-web > file_contexts.txt
+sudo semanage fcontext -l | grep mephi-web >> file_contexts.txt 2>/dev/null || true
+getcap /usr/sbin/tcpdump > tcpdump_capabilities.txt
+ls -ld /data /data/mephi-web > permissions.txt
+ls -l /data/mephi-web >> permissions.txt
+id ivan > users_groups.txt
+id mephi-admin >> users_groups.txt
+getent group mephi-devs >> users_groups.txt
+cp /data/mephi-web/index.html index.html
+curl http://localhost > curl_output.txt
+curl http://192.168.64.2 >> curl_output.txt 2>&1 || true
+curl http://192.168.1.100 >> curl_output.txt 2>&1 || true
+ls -lh
+exit
+sudo systemctl restart nginx
+curl http://localhost
+curl http://192.168.64.2
+sudo nmcli connection modify enp0s1 ipv4.method manual ipv4.addresses 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.dns 8.8.8.8
+sudo nmcli connection down enp0s1; sudo nmcli connection up enp0s1
+sudo mkdir -p /mnt/utm
+sudo mount -t 9p -o trans=virtio,version=9p2000.L share /mnt/utm
+sudo cp report_M255648.txt /mnt/utm/
+ls /mnt/utm
+poweroff
+exit
+whoami
+hostname
+hostnamectl
+ip a
+nmcli connection show enp0s1
+lsblk
+lsblk -f
+df -h /data/mephi-web
+cat /etc/fstab
+systemctl status nginx --no-pager
+curl http://localhost
+getenforce
+getcap /usr/sbin/tcpdump
+cat /etc/ssh/denied_users
+history -a
+history > ~/project_history.txt
+cat ~/.bash_history >> ~/project_history.txt
+cp ~/project_history.txt ~/mephi-session-project-2026/project_history.txt
+ls -lh ~/project_history.txt ~/mephi-session-project-2026/project_history.txt
+whoami
+hostname
+hostnamectl
+ip a
+lsblk
+lsblk -f
+df -h /data/mephi-web
+cat /etc/fstab
+systemctl status nginx --no-pager
+curl http://localhost
+getenforce
+getcap /usr/sbin/tcpdump
+cat /etc/ssh/denied_users
+history -a
